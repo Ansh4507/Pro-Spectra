@@ -14,7 +14,6 @@ function App() {
   return (
     <div className="page-wrapper">
       <div className="theme-toggle">
-        <button onClick={toggleTheme}>{isDarkMode ? '🌞 Light Mode' : '🌙 Dark Mode'}</button>
       </div>
 
       <div className="glass-container">
