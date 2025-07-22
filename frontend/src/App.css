@@ -1,9 +1,81 @@
-body {
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f8f9fa;
+/* App.css */
+
+:root {
+  --bg-color: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --text-color: #fff;
 }
 
-h1 {
-  color: #333;
+[data-theme='light'] {
+  --bg-color: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  --glass-bg: rgba(255, 255, 255, 0.5);
+  --text-color: #111;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-color);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  color: var(--text-color);
+  transition: background 0.5s, color 0.5s;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.page-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+  padding: 1rem;
+  position: relative;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+}
+
+.theme-toggle button {
+  background-color: #4cc9f0;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 10px #4cc9f0;
+  transition: background 0.3s;
+}
+
+.theme-toggle button:hover {
+  background-color: #3a86ff;
+  color: #fff;
+}
+
+.glass-container {
+  background: var(--glass-bg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 600px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  text-align: center;
+}
+
+.glass-container h1 {
+  margin-top: 0;
+  font-size: 2rem;
 }

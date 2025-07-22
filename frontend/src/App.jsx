@@ -1,14 +1,26 @@
-import React from "react";
-import CompanyForm from "./components/CompanyForm";
-import ChatbotWidget from "./components/ChatbotWidget";
-import "./App.css";
+// App.jsx
+import React, { useState } from 'react';
+import './App.css';
+import CompanyForm from './components/CompanyForm';
 
 function App() {
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  const toggleTheme = () => {
+    setIsDarkMode(prev => !prev);
+    document.documentElement.setAttribute('data-theme', isDarkMode ? 'light' : 'dark');
+  };
+
   return (
-    <div>
-      <h1 style={{ textAlign: "center", marginTop: "20px" }}>📊 ProSpectra - Company Tracker</h1>
-      <CompanyForm />
-      <ChatbotWidget />
+    <div className="page-wrapper">
+      <div className="theme-toggle">
+        <button onClick={toggleTheme}>{isDarkMode ? '🌞 Light Mode' : '🌙 Dark Mode'}</button>
+      </div>
+
+      <div className="glass-container">
+        <h1>🚀 ProSpectra</h1>
+        <CompanyForm />
+      </div>
     </div>
   );
 }
