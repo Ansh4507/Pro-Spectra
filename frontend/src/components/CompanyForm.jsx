@@ -9,19 +9,22 @@ import {
   Textarea,
   VStack,
   Heading,
-  useColorMode,
   useColorModeValue,
-  IconButton,
   Flex,
   Switch,
+  useToast,
+  Divider,
+  Tag,
+  TagLabel,
+  TagCloseButton,
 } from '@chakra-ui/react';
-import { MoonIcon, SunIcon } from '@chakra-ui/icons';
+import { AddIcon } from '@chakra-ui/icons';
 
 const CompanyForm = () => {
-  const { colorMode, toggleColorMode } = useColorMode();
   const formBg = useColorModeValue('whiteAlpha.900', 'blackAlpha.600');
   const inputBg = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('gray.300', 'gray.600');
+  const toast = useToast();
 
   const [formData, setFormData] = useState({
     companyName: '',
@@ -45,14 +48,48 @@ const CompanyForm = () => {
   };
 
   const handleRoundAdd = () => {
-    if (formData.roundName && formData.roundQuestions) {
+    if (formData.roundName.trim() && formData.roundQuestions.trim()) {
       setFormData((prev) => ({
         ...prev,
-        rounds: [...prev.rounds, { name: prev.roundName, questions: prev.roundQuestions }],
+        rounds: [...prev.rounds, {
+          name: prev.roundName.trim(),
+          questions: prev.roundQuestions.trim()
+        }],
         roundName: '',
         roundQuestions: '',
       }));
     }
+  };
+
+  const handleRoundRemove = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      rounds: prev.rounds.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSubmit = () => {
+    // Future: Add POST request to backend
+    toast({
+      title: 'Company Added.',
+      description: `${formData.companyName} was successfully added.`,
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
+
+    setFormData({
+      companyName: '',
+      eligibilityStatus: '',
+      eligibilityNotes: '',
+      resumeUploaded: false,
+      topics: '',
+      description: '',
+      selectionStatus: '',
+      rounds: [],
+      roundName: '',
+      roundQuestions: '',
+    });
   };
 
   return (
@@ -70,29 +107,22 @@ const CompanyForm = () => {
         bg={formBg}
         border="1px solid"
         borderColor={borderColor}
-        boxShadow="xl"
-        borderRadius="xl"
+        boxShadow="2xl"
+        borderRadius="2xl"
         p={6}
         overflowY="auto"
         maxH="95vh"
       >
-        <Flex justify="space-between" align="center" mb={4}>
-          <Heading size="md" color="teal.400">🚀 ProSpectra</Heading>
-          <IconButton
-            size="sm"
-            onClick={toggleColorMode}
-            icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-            aria-label="Toggle mode"
-            variant="ghost"
-            colorScheme="teal"
-          />
-        </Flex>
+        <Heading size="lg" textAlign="center" color="teal.400" mb={6}>
+          🚀 ProSpectra - Add Company
+        </Heading>
 
         <VStack spacing={4}>
           <FormControl isRequired>
             <FormLabel>Company Name</FormLabel>
             <Input
               name="companyName"
+              placeholder="e.g., Google"
               bg={inputBg}
               value={formData.companyName}
               onChange={handleChange}
@@ -118,6 +148,7 @@ const CompanyForm = () => {
             <FormLabel>Eligibility Notes</FormLabel>
             <Input
               name="eligibilityNotes"
+              placeholder="e.g., CGPA > 7.5"
               bg={inputBg}
               value={formData.eligibilityNotes}
               onChange={handleChange}
@@ -125,7 +156,7 @@ const CompanyForm = () => {
           </FormControl>
 
           <FormControl display="flex" alignItems="center">
-            <FormLabel mb="0">Resume Uploaded (Yes/No)</FormLabel>
+            <FormLabel mb="0">Resume Uploaded</FormLabel>
             <Switch
               name="resumeUploaded"
               isChecked={formData.resumeUploaded}
@@ -135,9 +166,10 @@ const CompanyForm = () => {
           </FormControl>
 
           <FormControl>
-            <FormLabel>Topics to Revise (comma-separated)</FormLabel>
+            <FormLabel>Topics to Revise</FormLabel>
             <Input
               name="topics"
+              placeholder="e.g., DSA, OS, DBMS"
               bg={inputBg}
               value={formData.topics}
               onChange={handleChange}
@@ -148,6 +180,7 @@ const CompanyForm = () => {
             <FormLabel>Job Description</FormLabel>
             <Textarea
               name="description"
+              placeholder="e.g., Full-stack Developer role with emphasis on React & Node.js"
               bg={inputBg}
               value={formData.description}
               onChange={handleChange}
@@ -170,7 +203,9 @@ const CompanyForm = () => {
             </Select>
           </FormControl>
 
-          <Heading size="sm" mt={4}>Interview Rounds</Heading>
+          <Divider />
+
+          <Heading size="sm" mt={4} color="teal.400">Interview Rounds</Heading>
           <Flex gap={2} w="100%" flexWrap="wrap">
             <Input
               name="roundName"
@@ -188,13 +223,25 @@ const CompanyForm = () => {
               onChange={handleChange}
               flex="2"
             />
-            <Button onClick={handleRoundAdd} colorScheme="teal" minW="80px">
+            <Button onClick={handleRoundAdd} colorScheme="teal" leftIcon={<AddIcon />} minW="100px">
               Add
             </Button>
           </Flex>
 
-          <Button mt={4} colorScheme="blue" w="full">
-            Add Company
+          {formData.rounds.map((round, index) => (
+            <Tag size="md" key={index} colorScheme="purple" m={1}>
+              <TagLabel>{round.name}: {round.questions}</TagLabel>
+              <TagCloseButton onClick={() => handleRoundRemove(index)} />
+            </Tag>
+          ))}
+
+          <Button
+            mt={6}
+            colorScheme="blue"
+            w="full"
+            onClick={handleSubmit}
+          >
+            Submit Company Info
           </Button>
         </VStack>
       </Box>
