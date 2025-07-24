@@ -17,13 +17,15 @@ import {
   Tag,
   TagLabel,
   TagCloseButton,
+  IconButton,
+  Text
 } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 
 const CompanyForm = () => {
-  const formBg = useColorModeValue('whiteAlpha.900', 'blackAlpha.600');
+  const formBg = useColorModeValue('glass.light', 'glass.dark');
   const inputBg = useColorModeValue('white', 'gray.700');
-  const borderColor = useColorModeValue('gray.300', 'gray.600');
+  const borderColor = useColorModeValue('gray.200', 'gray.600');
   const toast = useToast();
 
   const [formData, setFormData] = useState({
@@ -48,16 +50,22 @@ const CompanyForm = () => {
   };
 
   const handleRoundAdd = () => {
-    if (formData.roundName.trim() && formData.roundQuestions.trim()) {
+    const { roundName, roundQuestions } = formData;
+    if (roundName.trim() && roundQuestions.trim()) {
       setFormData((prev) => ({
         ...prev,
-        rounds: [...prev.rounds, {
-          name: prev.roundName.trim(),
-          questions: prev.roundQuestions.trim()
-        }],
+        rounds: [...prev.rounds, { name: roundName.trim(), questions: roundQuestions.trim() }],
         roundName: '',
         roundQuestions: '',
       }));
+    } else {
+      toast({
+        title: 'Round details missing',
+        description: 'Please fill both round name and questions.',
+        status: 'warning',
+        duration: 2500,
+        isClosable: true,
+      });
     }
   };
 
@@ -69,10 +77,20 @@ const CompanyForm = () => {
   };
 
   const handleSubmit = () => {
-    // Future: Add POST request to backend
+    if (!formData.companyName.trim()) {
+      toast({
+        title: 'Missing Company Name',
+        status: 'error',
+        duration: 2500,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // 🚀 TODO: Connect to backend via POST
     toast({
-      title: 'Company Added.',
-      description: `${formData.companyName} was successfully added.`,
+      title: 'Company Info Saved!',
+      description: `${formData.companyName} added successfully.`,
       status: 'success',
       duration: 3000,
       isClosable: true,
@@ -95,26 +113,28 @@ const CompanyForm = () => {
   return (
     <Box
       minH="100vh"
-      bgGradient="linear(to-br, #0f172a, #1e293b)"
+      bgGradient="linear(to-br, slate.900, slate.800)"
       display="flex"
       justifyContent="center"
       alignItems="center"
       px={4}
-      py={6}
+      py={10}
     >
       <Box
-        w={['100%', '90%', '500px']}
+        w={['100%', '90%', '520px']}
         bg={formBg}
         border="1px solid"
         borderColor={borderColor}
-        boxShadow="2xl"
+        boxShadow="xl"
         borderRadius="2xl"
-        p={6}
-        overflowY="auto"
+        p={8}
         maxH="95vh"
+        overflowY="auto"
+        backdropFilter="blur(10px)"
+        sx={{ '::-webkit-scrollbar': { width: '4px' } }}
       >
-        <Heading size="lg" textAlign="center" color="teal.400" mb={6}>
-          🚀 ProSpectra - Add Company
+        <Heading size="lg" textAlign="center" mb={6} color="brand.400">
+          🚀 Add a Company
         </Heading>
 
         <VStack spacing={4}>
@@ -133,11 +153,11 @@ const CompanyForm = () => {
             <FormLabel>Eligibility Status</FormLabel>
             <Select
               name="eligibilityStatus"
+              placeholder="Select"
               bg={inputBg}
               value={formData.eligibilityStatus}
               onChange={handleChange}
             >
-              <option value="">Select</option>
               <option value="Eligible">Eligible</option>
               <option value="Not Eligible">Not Eligible</option>
               <option value="Check Later">Check Later</option>
@@ -155,7 +175,7 @@ const CompanyForm = () => {
             />
           </FormControl>
 
-          <FormControl display="flex" alignItems="center">
+          <FormControl display="flex" alignItems="center" gap={4}>
             <FormLabel mb="0">Resume Uploaded</FormLabel>
             <Switch
               name="resumeUploaded"
@@ -180,7 +200,7 @@ const CompanyForm = () => {
             <FormLabel>Job Description</FormLabel>
             <Textarea
               name="description"
-              placeholder="e.g., Full-stack Developer role with emphasis on React & Node.js"
+              placeholder="e.g., Full-stack role with React & Node"
               bg={inputBg}
               value={formData.description}
               onChange={handleChange}
@@ -191,11 +211,11 @@ const CompanyForm = () => {
             <FormLabel>Selection Status</FormLabel>
             <Select
               name="selectionStatus"
+              placeholder="Select"
               bg={inputBg}
               value={formData.selectionStatus}
               onChange={handleChange}
             >
-              <option value="">Select</option>
               <option value="Applied">Applied</option>
               <option value="Interviewing">Interviewing</option>
               <option value="Selected">Selected</option>
@@ -203,9 +223,9 @@ const CompanyForm = () => {
             </Select>
           </FormControl>
 
-          <Divider />
+          <Divider mt={6} />
 
-          <Heading size="sm" mt={4} color="teal.400">Interview Rounds</Heading>
+          <Heading size="sm" color="brand.300" mt={4}>Interview Rounds</Heading>
           <Flex gap={2} w="100%" flexWrap="wrap">
             <Input
               name="roundName"
@@ -223,23 +243,30 @@ const CompanyForm = () => {
               onChange={handleChange}
               flex="2"
             />
-            <Button onClick={handleRoundAdd} colorScheme="teal" leftIcon={<AddIcon />} minW="100px">
-              Add
-            </Button>
+            <IconButton
+              icon={<AddIcon />}
+              aria-label="Add round"
+              colorScheme="teal"
+              onClick={handleRoundAdd}
+            />
           </Flex>
 
-          {formData.rounds.map((round, index) => (
-            <Tag size="md" key={index} colorScheme="purple" m={1}>
-              <TagLabel>{round.name}: {round.questions}</TagLabel>
-              <TagCloseButton onClick={() => handleRoundRemove(index)} />
-            </Tag>
-          ))}
+          <Flex gap={2} flexWrap="wrap" maxH="120px" overflowY="auto">
+            {formData.rounds.map((round, index) => (
+              <Tag size="md" key={index} colorScheme="purple" m={1} borderRadius="lg">
+                <TagLabel>{round.name}: {round.questions}</TagLabel>
+                <TagCloseButton onClick={() => handleRoundRemove(index)} />
+              </Tag>
+            ))}
+          </Flex>
 
           <Button
             mt={6}
-            colorScheme="blue"
             w="full"
+            colorScheme="brand"
             onClick={handleSubmit}
+            size="lg"
+            borderRadius="xl"
           >
             Submit Company Info
           </Button>
